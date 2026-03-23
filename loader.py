@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-df = pd.read_csv("labels.csv")
+df = pd.read_csv("MP_Data.csv")
 
 X, y = [], []
 

@@ -7,11 +7,10 @@ from tensorflow.keras.layers import LSTM, Dense, Bidirectional, Dropout, Conv1D,
 from tensorflow.keras.callbacks import EarlyStopping
 
 # 1. SETUP PATHS (Adjust 'MP_Data' if your folder has a different name)
-DATA_PATH = 'label.csv'
+DATA_PATH = 'MP_Data.csv'
 actions = np.array([res for res in os.listdir(DATA_PATH)]) # Automatically gets sign names
 sequence_length = 30 # Number of frames per video
 no_sequences = 30    # Number of videos per sign
-
 label_map = {label:num for num, label in enumerate(actions)}
 
 # 2. LOAD DATASET

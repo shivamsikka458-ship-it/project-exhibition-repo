@@ -6,29 +6,46 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Bidirectional, Dropout, Conv1D, MaxPooling1D, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping
 
-# 1. SETUP PATHS (Adjust 'MP_Data' if your folder has a different name)
-DATA_PATH = 'MP_Data.csv'
-actions = np.array([res for res in os.listdir(DATA_PATH)]) # Automatically gets sign names
-sequence_length = 30 # Number of frames per video
-no_sequences = 30    # Number of videos per sign
-label_map = {label:num for num, label in enumerate(actions)}
+import numpy as np
+import os
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.utils import to_categorical
 
-# 2. LOAD DATASET
-print("Loading data from your repository folders...")
-sequences, labels = [], []
-for action in actions:
-    for sequence in range(no_sequences):
-        window = []
-        for frame_num in range(sequence_length):
-            res = np.load(os.path.join(DATA_PATH, action, str(sequence), "{}.npy".format(frame_num)))
-            window.append(res)
-        sequences.append(window)
-        labels.append(label_map[action])
+DATA_PATH = "sign_language_dataset/data"
 
-X = np.array(sequences) # Shape: (Total_Samples, 30, 63)
-y = to_categorical(labels).astype(int)
+X = []
+y = []
+
+# Automatically get labels
+actions = set()
+for file in os.listdir(DATA_PATH):
+    if file.endswith(".npy"):
+        actions.add(file.split("_")[0])
+
+actions = np.array(list(actions))
+label_map = {label: num for num, label in enumerate(actions)}
+
+# Load data
+for file in os.listdir(DATA_PATH):
+    if file.endswith(".npy"):
+        sequence = np.load(os.path.join(DATA_PATH, file))
+        X.append(sequence)
+
+        word = file.split("_")[0]
+        y.append(label_map[word])
+
+X = np.array(X)
+y = to_categorical(y).astype(int)
+
+print("X shape:", X.shape)
+print("y shape:", y.shape)
+indices = np.arange(len(X))
+np.random.shuffle(indices)
+X = X[indices]
+y = y[indices]
+
+# Train test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-
 # 3. THE 95% ACCURACY ARCHITECTURE (CNN + BiLSTM)
 model = Sequential()
 # CNN: Spatial feature extraction

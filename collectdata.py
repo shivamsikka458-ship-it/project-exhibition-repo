@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import mediapipe as mp
+import time
 
 # SETTINGS
 word = "hello"          # change word each time
@@ -23,9 +24,18 @@ def extract_keypoints(results):
     return [0]*63  # if no hand detected
 
 for sample in range(samples):
+    print(f"Get ready for sample {sample+1}")
+    time.sleep(2)   # ⏳ ADD HERE
+    for i in range(3, 0, -1):
+        ret, frame = cap.read()
+        cv2.putText(frame, f"Starting in {i}",
+                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+                    1, (0,0,255), 2)
+        cv2.imshow("Recording", frame)
+        cv2.waitKey(1000)
+
     sequence = []
     print(f"Recording sample {sample+1}")
-
     for frame_num in range(frames_per_sample):
         ret, frame = cap.read()
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
